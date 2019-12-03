@@ -115,6 +115,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="codigo\bmp.h" />
+    <ClInclude Include="codigo\igvCamara.h" />
+    <ClInclude Include="codigo\igvColor.h" />
+    <ClInclude Include="codigo\igvEscena3D.h" />
+    <ClInclude Include="codigo\igvFuenteLuz.h" />
+    <ClInclude Include="codigo\igvInterfaz.h" />
+    <ClInclude Include="codigo\igvMallaTriangulos.h" />
+    <ClInclude Include="codigo\igvMaterial.h" />
+    <ClInclude Include="codigo\igvPunto3D.h" />
+    <ClInclude Include="codigo\igvTextura.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="codigo\bmp.cpp" />
+    <ClCompile Include="codigo\igvCamara.cpp" />
+    <ClCompile Include="codigo\igvColor.cpp" />
+    <ClCompile Include="codigo\igvEscena3D.cpp" />
+    <ClCompile Include="codigo\igvFuenteLuz.cpp" />
+    <ClCompile Include="codigo\igvInterfaz.cpp" />
+    <ClCompile Include="codigo\igvMallaTriangulos.cpp" />
+    <ClCompile Include="codigo\igvMaterial.cpp" />
+    <ClCompile Include="codigo\igvPunto3D.cpp" />
+    <ClCompile Include="codigo\igvTextura.cpp" />
+    <ClCompile Include="codigo\proyectoDeco.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
