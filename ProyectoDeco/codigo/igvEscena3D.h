@@ -69,6 +69,10 @@ class igvEscena3D {
 	void muslo();
 	void pierna();
 	void pintarFigura();
+	void pintar_quad(float div_x, float div_z);
+
+	void crearSuelo(int x, int y);
+	void crearPared(int largo, int alto);
 
 
 ////// Apartado D: añadir aquí los métodos para modificar los grados de libertad del modelo

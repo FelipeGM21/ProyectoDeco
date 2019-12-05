@@ -9,7 +9,7 @@ igvInterfaz interfaz;
 int main (int argc, char** argv) {
 	// inicializa la ventana de visualización
 	interfaz.configura_entorno(argc,argv,
-		                         1200,720, // tamaño de la ventana
+		                         720,720, // tamaño de la ventana
 														 0,0, // posicion de la ventana
 														 "Informática Gráfica y Visualización. Proyecto Decoracion de Interiores." // título de la ventana
 														 );

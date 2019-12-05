@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "igvEscena3D.h"
+#include "igvMaterial.h"
 
 // Metodos constructores 
 
@@ -156,10 +157,13 @@ void igvEscena3D::pierna()
 }
 
 void igvEscena3D::pintarFigura() {
-	
+
 	//Comenzamos a dibujar la figura
 	glMaterialfv(GL_FRONT, GL_EMISSION, gris);
 	glPushMatrix();
+
+	//Posicionar en baldosa 0,0
+	glTranslatef(0.5,1.55,0.5);
 
 	//Rotacion figura completa
 	glRotatef(matrizRotaciones[0][ejex], 1, 0, 0);
@@ -282,6 +286,71 @@ void igvEscena3D::pintarFigura() {
 }
 
 
+void igvEscena3D::pintar_quad(float div_x, float div_z) {
+	float ini_x = 0.0;
+	float ini_z = 0.0;
+	float tam_x = 1.0;
+	float tam_z = 1.0;
+
+	glNormal3f(0, 1, 0);
+	glBegin(GL_QUADS);
+	glVertex3f(ini_x, 0.0, ini_z);
+	glVertex3f(ini_x, 0.0, ini_z + tam_z);
+	glVertex3f(ini_x + tam_x, 0.0, ini_z + tam_z);
+	glVertex3f(ini_x + tam_x, 0.0, ini_z);
+	glEnd();
+}
+
+void igvEscena3D::crearSuelo(int tamx, int tamy) {
+	igvColor kBlanco = igvColor(1, 1, 1);
+	igvColor kNegro = igvColor(0, 0, 0);
+	igvColor kDifuso = igvColor(0, 0, 0);
+	igvColor kSpecular = igvColor(0, 0, 0);
+	igvMaterial blanco = igvMaterial(kBlanco,kDifuso,kSpecular,1);
+	igvMaterial negro = igvMaterial(kNegro, kDifuso, kSpecular, 1);
+
+	
+	for (int x = 0; x < tamx; x++) {
+		for (int z = 0; z < tamy; z++) {
+			glPushMatrix();
+			glTranslatef(x, 0, z);
+			if ((x + z)%2 == 0) {
+				blanco.aplicar();
+			}
+			else {
+				negro.aplicar();
+			}
+			pintar_quad(1, 1);
+			glPopMatrix();
+		}
+	}
+}
+
+void igvEscena3D::crearPared(int alto, int largo) {
+	igvColor kBlanco = igvColor(1, 1, 1);
+	igvColor kNegro = igvColor(0, 0, 0);
+	igvColor kDifuso = igvColor(0, 0, 0);
+	igvColor kSpecular = igvColor(0, 0, 0);
+	igvMaterial blanco = igvMaterial(kBlanco, kDifuso, kSpecular, 1);
+	igvMaterial negro = igvMaterial(kNegro, kDifuso, kSpecular, 1);
+	
+	for (int x = 0; x < largo; x++) {
+		for (int z = 0; z < alto; z++) {
+			glPushMatrix();
+			glTranslatef(x, 0, z);
+			if ((x + z) % 2 == 0) {
+				blanco.aplicar();
+			}
+			else {
+				negro.aplicar();
+			}
+			pintar_quad(1, 1);
+			glPopMatrix();
+		}
+	}
+}
+
+
 void igvEscena3D::seleccionar(int parte) {
 	parteSeleccionada = parte;
 }
@@ -289,7 +358,7 @@ void igvEscena3D::seleccionar(int parte) {
 void igvEscena3D::cambiarParte(int eje, int incremento) {
 	if (parteSeleccionada >= 0 && parteSeleccionada < 9) {
 		matrizRotaciones[parteSeleccionada][eje] += incremento;
-		if (parteSeleccionada > 0 && matrizRotaciones[parteSeleccionada][eje] > 90 ) {
+		if (parteSeleccionada > 0 && matrizRotaciones[parteSeleccionada][eje] > 90) {
 			matrizRotaciones[parteSeleccionada][eje] = 90;
 		}
 		else {
@@ -313,8 +382,8 @@ void igvEscena3D::pintar_BV(float escalaX, float escalaY, float escalaZ, GLubyte
 
 }
 
-void igvEscena3D::pintarFiguraBV(){
-	
+void igvEscena3D::pintarFiguraBV() {
+
 	GLubyte color[3];
 	color[0] = 0;
 	color[1] = 0;
@@ -346,7 +415,7 @@ void igvEscena3D::pintarFiguraBV(){
 	glPopMatrix();
 	glPopMatrix();
 	//Cabeza BV
-	
+
 	glPushMatrix();
 	glTranslatef(0, 0.5, 0);
 	pintar_BV(0.8, 0.8, 0.8, color);
@@ -490,7 +559,7 @@ void igvEscena3D::visualizar_BV() {
 
 }
 
-void igvEscena3D::activar_BV(){
+void igvEscena3D::activar_BV() {
 	bv = !bv;
 }
 
@@ -514,9 +583,24 @@ void igvEscena3D::visualizar() {
 /////             se recomienda crear una método auxiliar que encapsule todo el código para la visualización
 /////             del modelo, dejando aquí sólo la llamada a ese método, así como distintas funciones una para cada
 /////			  parte del modelo. 
+	crearSuelo(5,5);
+
+	glPushMatrix();
+	int baldosaX = 1;
+	int baldosaZ = 3;
+	glTranslatef(baldosaX, 0, baldosaZ);
+	pintarFigura();
+	glPopMatrix();
 	
-	pintarFigura();	
-	visualizar_BV();
+	glPushMatrix();
+	glRotatef(-90, 1, 0, 0);
+	crearPared(4,10);
+	glPopMatrix();
+	glRotatef(-90, 1, 0, 0);
+	glRotatef(-90, 0, 0, 1);
+	crearPared(6,10);
+	glPopMatrix();
+	//visualizar_BV();
 
 	///// En el apartado E habrá que asignar un color de selección al objeto para indicar que la parte seleccionada se
 	/////			visualice de un color distinto
