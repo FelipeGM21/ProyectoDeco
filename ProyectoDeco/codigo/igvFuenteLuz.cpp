@@ -128,7 +128,15 @@ void igvFuenteLuz::aplicar(void) {
 		//	activar la luz
 		glEnable(idLuz);
 		//	establecer la posición de la luz
-		GLfloat pos[4] = {posicion[0],posicion[1] ,posicion[2],0 };
+		GLfloat pos[4];
+		pos[0] = posicion[0];
+		pos[1] = posicion[1];
+		pos[2] = posicion[2];
+		if (angulo_foco == 180) {
+			pos[3] = 1;
+		}else {
+			pos[3] = 0;
+		}		
 		glLightfv(idLuz, GL_POSITION, pos);
 
 		//	establecer los colores ambiental, difuso y especular

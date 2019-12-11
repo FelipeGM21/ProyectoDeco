@@ -4,66 +4,71 @@
 #include "igvInterfaz.h"
 
 extern igvInterfaz interfaz; // los callbacks deben ser estaticos y se requiere este objeto para acceder desde
-                             // ellos a las variables de la clase
+							 // ellos a las variables de la clase
 
 // Metodos constructores -----------------------------------
 
-igvInterfaz::igvInterfaz() :tipoCam(IGV_PARALELA), p0(3.0, 2.0, 4), r(0, 0, 0), v(0, 1.0, 0),
-xwmin(-1 * 3), xwmax(1 * 3), ywmin(-1 * 3), ywmax(1 * 3), znear(1.0), zfar(100), angulo(60.0), raspecto(1.0),
-tipoPerspectiva(0), factor(1.0), formato169(false), pos_x(0), pos_y(0) {
+igvInterfaz::igvInterfaz() :tipoCam(IGV_PERSPECTIVA), posicion(3.0, 2.0, 4), centro(-3.0, -2.0, -4), vector_up(0, 1.0, 0),
+xwmin(-1 * 3), xwmax(1 * 3), ywmin(-1 * 3), ywmax(1 * 3), znear(0.1), zfar(100), angulo(60.0), raspecto(1.0),
+tipoPerspectiva(0), factor(1.0), formato169(false), pos_x(0), pos_y(0),pitch(-0.4),yaw(-2.3) {
 	//// Apartado E: inicialización de los atributos para realizar la selección
 	modo = IGV_VISUALIZAR;
 	objeto_seleccionado = -1;
 	boton_retenido = false;
 
 	//Perspectiva
-	perspectivas[0][0] = p0;
-	perspectivas[1][0] = r;
-	perspectivas[2][0] = v;
+	perspectivas[0][0] = { 3.0, 2.0, 4 };
+	perspectivas[1][0] = centro;
+	perspectivas[2][0] = { 0, 1.0, 0 };
 	//Alzado
-	perspectivas[0][1] = { 3.0,0.0,0 };
-	perspectivas[1][1] = r;
+	perspectivas[0][1] = { 3.0,1.5,1.5 };
+	perspectivas[1][1] = { -1.0,0,0 };
 	perspectivas[2][1] = { 0,1.0,0 };
 	//Planta
-	perspectivas[0][2] = { 0,3.0,0 };
-	perspectivas[1][2] = r;
+	perspectivas[0][2] = { 1.5,4.0,1.5 };
+	perspectivas[1][2] = { 0,-1.0,0 };
 	perspectivas[2][2] = { 1.0,0,0 };
 	//Perfil
-	perspectivas[0][3] = { 0,0,3.0 };
-	perspectivas[1][3] = r;
+	perspectivas[0][3] = { 1.5,1.5,3.0 };
+	perspectivas[1][3] = { 0,0,-1.0 };
 	perspectivas[2][3] = { 0,1.0,0 };
 }
-igvInterfaz::~igvInterfaz () {}
+igvInterfaz::~igvInterfaz() {}
 
 
 // Metodos publicos ----------------------------------------
 
 void igvInterfaz::crear_mundo(void) {
 	// crear cámaras
-	interfaz.camara.set(IGV_PARALELA, igvPunto3D(3.0,2.0,4),igvPunto3D(0,0,0),igvPunto3D(0,1.0,0),
-		                                -1*4.5, 1*4.5, -1*4.5, 1*4.5, -1*3, 200);
+	interfaz.camara.set(interfaz.tipoCam,
+		interfaz.posicion, interfaz.centro, interfaz.vector_up,
+		interfaz.xwmin*interfaz.factor, interfaz.xwmax*interfaz.factor, interfaz.ywmin*interfaz.factor, interfaz.ywmax*interfaz.factor, interfaz.znear, interfaz.zfar);
+	interfaz.camara.set(interfaz.tipoCam,
+		interfaz.posicion, interfaz.camara.target, interfaz.vector_up,
+		interfaz.angulo*interfaz.factor, interfaz.raspecto, interfaz.znear, interfaz.zfar);
+	camara.aplicar();
 }
 
 void igvInterfaz::configura_entorno(int argc, char** argv,
-			                              int _ancho_ventana, int _alto_ventana,
-			                              int _pos_X, int _pos_Y,
-													          string _titulo){
+	int _ancho_ventana, int _alto_ventana,
+	int _pos_X, int _pos_Y,
+	string _titulo) {
 	// inicialización de las variables de la interfaz																	
 	ancho_ventana = _ancho_ventana;
 	alto_ventana = _alto_ventana;
 
 	// inicialización de la ventana de visualización
 	glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
-  glutInitWindowSize(_ancho_ventana,_alto_ventana);
-  glutInitWindowPosition(_pos_X,_pos_Y);
+	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
+	glutInitWindowSize(_ancho_ventana, _alto_ventana);
+	glutInitWindowPosition(_pos_X, _pos_Y);
 	glutCreateWindow(_titulo.c_str());
 
 	glEnable(GL_DEPTH_TEST); // activa el ocultamiento de superficies por z-buffer
-  glClearColor(1.0,1.0,1.0,0.0); // establece el color de fondo de la ventana
+	glClearColor(1.0, 1.0, 1.0, 0.0); // establece el color de fondo de la ventana
 
 	glEnable(GL_LIGHTING); // activa la iluminacion de la escena
-  glEnable(GL_NORMALIZE); // normaliza los vectores normales para calculo iluminacion
+	glEnable(GL_NORMALIZE); // normaliza los vectores normales para calculo iluminacion
 
 	glEnable(GL_TEXTURE_2D); // activa el uso de texturas
 
@@ -83,22 +88,27 @@ void igvInterfaz::set_glutSpecialFunc(int key, int x, int y) {
 
 void igvInterfaz::set_glutKeyboardFunc(unsigned char key, int x, int y) {
 	switch (key) {
-	case 'w': interfaz.p0[2] += 0.1;
-//		interfaz.perspectivas[0][0][2] += 0.1;
-		interfaz.r[2] += 0.1;
+	case 'w': interfaz.posicion[2] += 0.1;
 		break;
-	case 'a': interfaz.p0[0] += 0.1;
-		interfaz.r[0] += 0.1;
+	case 'a': interfaz.posicion[0] += 0.1;
 		break;
-	case 's': interfaz.p0[2] -= 0.1;
-		interfaz.r[2] -= 0.1;
+	case 's': interfaz.posicion[2] -= 0.1;
 		break;
-	case 'd': interfaz.p0[0] -= 0.1;
-		interfaz.r[0] -= 0.1;
+	case 'd': interfaz.posicion[0] -= 0.1;
 		break;
-	case 'q': interfaz.p0[1] -= 0.1;
+	case 'q': interfaz.posicion[1] -= 0.1;
 		break;
-	case 'r': interfaz.p0[1] += 0.1;
+	case 'r': interfaz.posicion[1] += 0.1;
+		break;
+	case 'i': if (interfaz.pitch < 1)
+		interfaz.pitch += 0.1;
+		break;
+	case 'k': if (interfaz.centro[1] > -0.5)
+		interfaz.pitch -= 0.1;
+		break;
+	case 'j': interfaz.yaw -= 0.1;
+		break;
+	case 'l': interfaz.yaw += 0.1;
 		break;
 	case 'p': // cambia el tipo de proyección de paralela a perspectiva y viceversa
 		if (interfaz.tipoCam == IGV_PARALELA) {
@@ -120,32 +130,32 @@ void igvInterfaz::set_glutKeyboardFunc(unsigned char key, int x, int y) {
 	case 'C': // decrementar la distancia del plano cercano
 		interfaz.znear -= 0.2;
 		break;
-	//case '9': // cambiar a formato 16:9 con deformación
-	//	if (interfaz.formato169) {
-	//		interfaz.pos_x = 0;
-	//		interfaz.pos_y = 0;
-	//		interfaz.ancho_window = interfaz.ancho_ventana;
-	//		interfaz.alto_ventana = interfaz.alto_ventana;
-	//		interfaz.formato169 = false;
-	//	}
-	//	else {
-	//		interfaz.pos_x = 0;
-	//		interfaz.pos_y = ((interfaz.alto_ventana / 16) * 9) / 2;
-	//		interfaz.ancho_window = interfaz.ancho_ventana;
-	//		interfaz.alto_window = (interfaz.alto_ventana / 16) * 9;
-	//		interfaz.formato169 = true;
-	//	}
-	//	//interfaz.set_glutDisplayFunc();
-	//	break;
-		////// Apartado D: incluir aquí el cambio de la cámara para mostrar las vistas planta, perfil, alzado o perspectiva
+		//case '9': // cambiar a formato 16:9 con deformación
+		//	if (interfaz.formato169) {
+		//		interfaz.pos_x = 0;
+		//		interfaz.pos_y = 0;
+		//		interfaz.ancho_window = interfaz.ancho_ventana;
+		//		interfaz.alto_ventana = interfaz.alto_ventana;
+		//		interfaz.formato169 = false;
+		//	}
+		//	else {
+		//		interfaz.pos_x = 0;
+		//		interfaz.pos_y = ((interfaz.alto_ventana / 16) * 9) / 2;
+		//		interfaz.ancho_window = interfaz.ancho_ventana;
+		//		interfaz.alto_window = (interfaz.alto_ventana / 16) * 9;
+		//		interfaz.formato169 = true;
+		//	}
+		//	//interfaz.set_glutDisplayFunc();
+		//	break;
+			////// Apartado D: incluir aquí el cambio de la cámara para mostrar las vistas planta, perfil, alzado o perspectiva
 	case 'v': // cambia la posición de la cámara para mostrar las vistas planta, perfil, alzado o perspectiva
 		interfaz.tipoPerspectiva = (interfaz.tipoPerspectiva + 1) % 4;
-		interfaz.p0 = interfaz.perspectivas[0][interfaz.tipoPerspectiva];
-		interfaz.r = interfaz.perspectivas[1][interfaz.tipoPerspectiva];
-		interfaz.v = interfaz.perspectivas[2][interfaz.tipoPerspectiva];
+		interfaz.posicion = interfaz.perspectivas[0][interfaz.tipoPerspectiva];
+		interfaz.centro = interfaz.perspectivas[1][interfaz.tipoPerspectiva];
+		interfaz.vector_up = interfaz.perspectivas[2][interfaz.tipoPerspectiva];
 		break;
 		////// Apartado D: incluir aquí la modificación de los grados de libertad del modelo pulsando las teclas correspondientes
-	case 'k': interfaz.objeto_seleccionado++;
+	case 'm': interfaz.objeto_seleccionado++;
 		if (interfaz.objeto_seleccionado > 8) interfaz.objeto_seleccionado = 0;
 		interfaz.escena.seleccionar(interfaz.objeto_seleccionado);
 		break;
@@ -168,14 +178,17 @@ void igvInterfaz::set_glutKeyboardFunc(unsigned char key, int x, int y) {
 		exit(1);
 		break;
 	}
+	interfaz.centro[0] = cos(interfaz.pitch) * cos(interfaz.yaw);
+	interfaz.centro[1] = sin(interfaz.pitch);
+	interfaz.centro[2] = cos(interfaz.pitch) * sin(interfaz.yaw);
 	if (interfaz.tipoCam == IGV_PARALELA) {
 		interfaz.camara.set(interfaz.tipoCam,
-			interfaz.p0, interfaz.r, interfaz.v,
+			interfaz.posicion, interfaz.centro, interfaz.vector_up,
 			interfaz.xwmin*interfaz.factor, interfaz.xwmax*interfaz.factor, interfaz.ywmin*interfaz.factor, interfaz.ywmax*interfaz.factor, interfaz.znear, interfaz.zfar);
 	}
 	else {
 		interfaz.camara.set(interfaz.tipoCam,
-			interfaz.p0, interfaz.camara.r, interfaz.v,
+			interfaz.posicion, interfaz.centro, interfaz.vector_up,
 			interfaz.angulo*interfaz.factor, interfaz.raspecto, interfaz.znear, interfaz.zfar);
 	}
 	interfaz.camara.aplicar();
@@ -183,10 +196,10 @@ void igvInterfaz::set_glutKeyboardFunc(unsigned char key, int x, int y) {
 }
 
 void igvInterfaz::set_glutReshapeFunc(int w, int h) {
-  // dimensiona el viewport al nuevo ancho y alto de la ventana
-  // guardamos valores nuevos de la ventana de visualizacion
-  interfaz.set_ancho_ventana(w);
-  interfaz.set_alto_ventana(h);
+	// dimensiona el viewport al nuevo ancho y alto de la ventana
+	// guardamos valores nuevos de la ventana de visualizacion
+	interfaz.set_ancho_ventana(w);
+	interfaz.set_alto_ventana(h);
 
 	// establece los parámetros de la cámara y de la proyección
 	interfaz.camara.aplicar();

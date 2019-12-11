@@ -41,11 +41,12 @@ class igvInterfaz {
 		int pos_x;
 		int pos_y;
 		tipoCamara tipoCam;
-		igvPunto3D p0;
-		igvPunto3D r;
-		igvPunto3D v;
+		igvPunto3D posicion;
+		igvPunto3D centro;
+		igvPunto3D vector_up;
 		double xwmin, xwmax, ywmin, ywmax, znear, zfar;
 		double angulo, raspecto;
+		float pitch, yaw;
 		igvPunto3D perspectivas[3][4];
 		int tipoPerspectiva;
 		float factor;

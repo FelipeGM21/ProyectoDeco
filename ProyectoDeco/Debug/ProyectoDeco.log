@@ -1,0 +1,4 @@
+﻿  igvInterfaz.cpp
+c:\users\felipe\source\repos\proyectodeco\proyectodeco\codigo\igvpunto3d.h(25): warning C4091: 'typedef ': se ha omitido a la izquierda de '<unnamed-enum-X>' cuando no hay ninguna variable declarada
+c:\users\felipe\source\repos\proyectodeco\proyectodeco\codigo\igvcolor.h(17): warning C4091: 'typedef ': se ha omitido a la izquierda de '<unnamed-enum-R>' cuando no hay ninguna variable declarada
+  ProyectoDeco.vcxproj -> C:\Users\Felipe\source\repos\ProyectoDeco\Debug\ProyectoDeco.exe

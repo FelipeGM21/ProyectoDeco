@@ -34,13 +34,13 @@ class igvCamara {
 		GLdouble znear, zfar;
 
 		// punto de visión
-		igvPunto3D P0;
+		igvPunto3D position;
 
 		// punto de referencia de visión
-		igvPunto3D r;
+		igvPunto3D target;
 
 		// vector arriba
-		igvPunto3D V;
+		igvPunto3D up;
 
 		// Metodos
 
@@ -50,19 +50,20 @@ class igvCamara {
 		~igvCamara();
 
 		// Otros constructores
-		igvCamara(tipoCamara _tipo, igvPunto3D _P0, igvPunto3D _r, igvPunto3D _V);
+		igvCamara(tipoCamara _tipo, igvPunto3D _position, igvPunto3D _target, igvPunto3D _up);
 
 		// Metodos
 		// define la posición de la cámara
-		void set(igvPunto3D _P0, igvPunto3D _r, igvPunto3D _V);
+		void set(igvPunto3D _position, igvPunto3D _target, igvPunto3D _up);
 
 		// define una cámara de tipo paralela o frustum
-		void set(tipoCamara _tipo, igvPunto3D _P0, igvPunto3D _r, igvPunto3D _V,
+		void set(tipoCamara _tipo, igvPunto3D _position, igvPunto3D _target, igvPunto3D _up,
 			                         double _xwmin, double _xwmax, double _ywmin, double _ywmax, double _znear, double _zfar);
 
 		// define una cámara de tipo perspectiva
-		void set(tipoCamara _tipo, igvPunto3D _P0, igvPunto3D _r, igvPunto3D _V,
+		void set(tipoCamara _tipo, igvPunto3D _position, igvPunto3D _target, igvPunto3D _up,
 			                         double _angulo, double _raspecto, double _znear, double _zfar);
+
 
 		void aplicar(void); // aplica a los objetos de la escena la transformación de visión y la transformación de proyección
 		                    // asociadas a los parámetros de la cámara

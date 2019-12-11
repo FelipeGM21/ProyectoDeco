@@ -31,6 +31,15 @@ class igvEscena3D {
 	double nPhong;
 	igvPunto3D puntoFoco;
 	igvMallaTriangulos *malla;
+	int altura;
+	int ancho;
+	int largo;
+	int ***matrizOcupacion;
+	int numeroFiguras;
+	int figurasDisponibles;
+	int figurasColocadas;
+	int *figuras;
+	int **posiciones;
 	protected:
 ////// Apartado D: añadir quí los atributos para el control de los grados de libertad del modelo
 		int matrizRotaciones[9][3];
