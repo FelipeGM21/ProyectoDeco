@@ -10,7 +10,7 @@ extern igvInterfaz interfaz; // los callbacks deben ser estaticos y se requiere 
 
 igvInterfaz::igvInterfaz() :tipoCam(IGV_PERSPECTIVA), posicion(3.0, 2.0, 4), centro(-3.0, -2.0, -4), vector_up(0, 1.0, 0),
 xwmin(-1 * 3), xwmax(1 * 3), ywmin(-1 * 3), ywmax(1 * 3), znear(0.1), zfar(100), angulo(60.0), raspecto(1.0),
-tipoPerspectiva(0), factor(1.0), formato169(false), pos_x(0), pos_y(0),pitch(-0.4),yaw(-2.3) {
+tipoPerspectiva(0), factor(1.0), formato169(false), pos_x(0), pos_y(0), pitch(-0.4), yaw(-2.3), cursorX(INT_MAX), cursorY(INT_MAX) {
 	//// Apartado E: inicialización de los atributos para realizar la selección
 	modo = IGV_VISUALIZAR;
 	objeto_seleccionado = -1;
@@ -37,6 +37,23 @@ igvInterfaz::~igvInterfaz() {}
 
 
 // Metodos publicos ----------------------------------------
+
+void igvInterfaz::actualiza_camara(void) {
+	interfaz.centro[0] = cos(interfaz.pitch) * cos(interfaz.yaw);
+	interfaz.centro[1] = sin(interfaz.pitch);
+	interfaz.centro[2] = cos(interfaz.pitch) * sin(interfaz.yaw);
+	if (interfaz.tipoCam == IGV_PARALELA) {
+		interfaz.camara.set(interfaz.tipoCam,
+			interfaz.posicion, interfaz.centro, interfaz.vector_up,
+			interfaz.xwmin*interfaz.factor, interfaz.xwmax*interfaz.factor, interfaz.ywmin*interfaz.factor, interfaz.ywmax*interfaz.factor, interfaz.znear, interfaz.zfar);
+	}
+	else {
+		interfaz.camara.set(interfaz.tipoCam,
+			interfaz.posicion, interfaz.centro, interfaz.vector_up,
+			interfaz.angulo*interfaz.factor, interfaz.raspecto, interfaz.znear, interfaz.zfar);
+	}
+	interfaz.camara.aplicar();
+}
 
 void igvInterfaz::crear_mundo(void) {
 	// crear cámaras
@@ -103,7 +120,7 @@ void igvInterfaz::set_glutKeyboardFunc(unsigned char key, int x, int y) {
 	case 'i': if (interfaz.pitch < 1)
 		interfaz.pitch += 0.1;
 		break;
-	case 'k': if (interfaz.centro[1] > -0.5)
+	case 'k': if (interfaz.pitch > -0.5)
 		interfaz.pitch -= 0.1;
 		break;
 	case 'j': interfaz.yaw -= 0.1;
@@ -129,6 +146,12 @@ void igvInterfaz::set_glutKeyboardFunc(unsigned char key, int x, int y) {
 		break;
 	case 'C': // decrementar la distancia del plano cercano
 		interfaz.znear -= 0.2;
+		break;
+	case 'g': //Crea una figura de tipo monigote
+		interfaz.escena.crearMuebles(0);
+		break;
+	case 'b':
+		interfaz.escena.borrarMuebles();
 		break;
 		//case '9': // cambiar a formato 16:9 con deformación
 		//	if (interfaz.formato169) {
@@ -178,20 +201,7 @@ void igvInterfaz::set_glutKeyboardFunc(unsigned char key, int x, int y) {
 		exit(1);
 		break;
 	}
-	interfaz.centro[0] = cos(interfaz.pitch) * cos(interfaz.yaw);
-	interfaz.centro[1] = sin(interfaz.pitch);
-	interfaz.centro[2] = cos(interfaz.pitch) * sin(interfaz.yaw);
-	if (interfaz.tipoCam == IGV_PARALELA) {
-		interfaz.camara.set(interfaz.tipoCam,
-			interfaz.posicion, interfaz.centro, interfaz.vector_up,
-			interfaz.xwmin*interfaz.factor, interfaz.xwmax*interfaz.factor, interfaz.ywmin*interfaz.factor, interfaz.ywmax*interfaz.factor, interfaz.znear, interfaz.zfar);
-	}
-	else {
-		interfaz.camara.set(interfaz.tipoCam,
-			interfaz.posicion, interfaz.centro, interfaz.vector_up,
-			interfaz.angulo*interfaz.factor, interfaz.raspecto, interfaz.znear, interfaz.zfar);
-	}
-	interfaz.camara.aplicar();
+	interfaz.actualiza_camara();
 	glutPostRedisplay(); // renueva el contenido de la ventana de vision
 }
 
@@ -211,14 +221,124 @@ void igvInterfaz::set_glutDisplayFunc() {
 	// se establece el viewport
 	glViewport(0, 0, interfaz.get_ancho_ventana(), interfaz.get_alto_ventana());
 
-	// establece los parámetros de la cámara y de la proyección
-	interfaz.camara.aplicar();
 
-	//visualiza la escena
-	interfaz.escena.visualizar();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // borra la ventana y el z-buffer
+	// se establece el viewport
+	glViewport(0, 0, interfaz.get_ancho_ventana(), interfaz.get_alto_ventana());
 
-	// refresca la ventana
-	glutSwapBuffers(); // se utiliza, en vez de glFlush(), para evitar el parpadeo
+	///// Apartado E: antes de aplicar las transformaciones de cámara y proyección hay que comprobar el modo para sólo visualizar o seleccionar:
+	if (interfaz.modo == IGV_SELECCIONAR) {
+		// Apartado E: Para que funcione habrá que dibujar la escena sin efectos, sin iluminación, sin texturas ...
+		glDisable(GL_LIGHTING); // desactiva la iluminacion de la escena
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glDisable(GL_TEXTURE_2D);
+		glDisable(GL_CULL_FACE);
+
+		// Apartado E: Reestablece los colores como no seleccionado
+
+		// Apartado E: aplica la cámara
+
+		// Apartado E: visualiza los BV cada uno de un color
+		interfaz.escena.visualizar_colores();
+		// Apartado E: Obtener el color del pixel seleccionado
+		int y;
+		y = interfaz.get_alto_ventana() - interfaz.cursorY;
+
+		GLubyte pixel[3];
+		glReadPixels(interfaz.cursorX, y, 1, 1, GL_RGB, GL_UNSIGNED_BYTE, &pixel);
+		// Apartado E: Comprobar el color del objeto que hay en el cursor mirando en la tabla de colores
+		interfaz.escena.seleccion_color(pixel);
+		// Apartado E: Asigna al objeto seleccionado el color amarillo
+
+		// Apartado E: Cambiar a modo de visualización de la escena
+
+		//glutSwapBuffers();
+		// Apartado E: Habilitar de nuevo la iluminación
+		glEnable(GL_LIGHTING);
+	}
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// establece los parámetros de la cámara y de la proyección
+		interfaz.camara.aplicar();
+
+		//visualiza la escena
+		interfaz.escena.visualizar();
+
+		// refresca la ventana
+		glutSwapBuffers(); // se utiliza, en vez de glFlush(), para evitar el parpadeo
+	
+}
+
+
+void igvInterfaz::set_glutMouseFunc(GLint boton, GLint estado, GLint x, GLint y) {
+
+	// Apartado E: comprobar que se ha pulsado el botón izquierdo 
+	if (boton == GLUT_LEFT_BUTTON && estado == GLUT_DOWN) {
+		if (!interfaz.boton_retenido) {
+			// Apartado E: guardar que el boton se ha presionado o se ha soltado, si se ha pulsado hay que
+			// pasar a modo IGV_SELECCIONAR
+			interfaz.botonPulsado = GLUT_LEFT_BUTTON;
+			interfaz.boton_retenido = true;
+			// Apartado E: guardar el pixel pulsado
+			interfaz.cursorX = x;
+			interfaz.cursorY = y;
+			interfaz.modo = IGV_SELECCIONAR;
+		}
+	}
+	else if (boton == GLUT_RIGHT_BUTTON && estado == GLUT_DOWN) {
+		if (!interfaz.boton_retenido) {
+			interfaz.botonPulsado = GLUT_RIGHT_BUTTON;
+			interfaz.cursorX = x;
+			interfaz.cursorY = y;
+			interfaz.boton_retenido = true;
+		}
+	}
+
+	if (estado == GLUT_UP) {
+		interfaz.boton_retenido = false;
+		interfaz.cursorX = INT_MAX;
+		interfaz.cursorY = INT_MAX;
+		interfaz.modo = IGV_VISUALIZAR;
+	}
+	// Apartado E: renovar el contenido de la ventana de vision 
+
+}
+
+void igvInterfaz::set_glutMotionFunc(GLint x, GLint y) {
+
+	// Apartado F: si el botón está retenido y hay algún objeto seleccionado,
+	// comprobar el objeto seleccionado y la posición del ratón y actualizar
+	// convenientemente el grado de libertad del objeto correspondiente 
+	if (interfaz.boton_retenido) {
+		if (interfaz.botonPulsado == GLUT_RIGHT_BUTTON) {
+			float sumaX = interfaz.cursorX - x;
+			float sumaY = interfaz.cursorY - y;
+			if (interfaz.pitch > -0.5 && sumaY < 0) {
+				interfaz.pitch += sumaY / 5000;
+			}
+			else {
+				if (interfaz.pitch < 1 && sumaY > 0)
+					interfaz.pitch += sumaY / 5000;
+			}
+			interfaz.yaw -= sumaX / 5000;
+		}
+		else {
+
+		}
+	}
+	// Apartado F: guardar la nueva posición del ratón 
+
+
+	interfaz.actualiza_camara();
+
+	// Apartado F: renovar el contenido de la ventana de vision 
+	glutPostRedisplay();
+
+}
+
+void igvInterfaz::set_glutIdleFunc() {
+	///// Apartado G: incluir el código para animar el modelo de la manera más realista posible
+
 }
 
 void igvInterfaz::inicializa_callbacks() {
@@ -226,4 +346,8 @@ void igvInterfaz::inicializa_callbacks() {
 	glutReshapeFunc(set_glutReshapeFunc);
 	glutDisplayFunc(set_glutDisplayFunc);
 	glutSpecialFunc(set_glutSpecialFunc);
+
+	glutMouseFunc(set_glutMouseFunc);
+	glutMotionFunc(set_glutMotionFunc);
+	glutIdleFunc(set_glutIdleFunc);
 }

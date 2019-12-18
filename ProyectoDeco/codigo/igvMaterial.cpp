@@ -35,20 +35,19 @@ void igvMaterial::aplicar(void) {
 	// - coeficiente de reflesión especular
 	// - exponente de Phong
 	float ambiente[4] = { (float)Ka[0], (float)Ka[1], (float)Ka[2],(float)Ka[3] };
-	glMaterialfv(GL_FRONT, GL_AMBIENT, ambiente);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, ambiente);
 
 	float difuso[4] = { (float)Kd[0], (float)Kd[1], (float)Kd[2],(float)Kd[3] };
-	glMaterialfv(GL_FRONT, GL_DIFFUSE, difuso);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, difuso);
 
 	float espectacular[4] = { (float)Ks[0], (float)Ks[1], (float)Ks[2],(float)Ks[3] };
-	glMaterialfv(GL_FRONT, GL_SPECULAR, espectacular);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, espectacular);
 
-	glMaterialf(GL_FRONT, GL_SHININESS, Ns);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Ns);
 
 	// establecer como color de emisión (0.0, 0.0, 0.0) (el objeto no es una fuente de luz)
 	GLfloat emision[3] = { 0,0,0 };
-	glMaterialfv(GL_FRONT,GL_EMISSION,emision);
-
+	glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,emision);
 
 }
 

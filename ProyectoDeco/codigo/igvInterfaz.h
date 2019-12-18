@@ -57,7 +57,7 @@ class igvInterfaz {
 						   // IGV_SELECCIONAR: se ha pulsado sobre la ventana de visualización, la escena se debe
 						   // visualizar en modo selección
 		int cursorX, cursorY; // pixel de la pantalla sobre el que está situado el ratón, por pulsar o arrastrar
-
+		GLint botonPulsado;
 		int objeto_seleccionado; // código del objeto seleccionado, -1 si no hay ninguno
 
 		bool boton_retenido; // indica si el botón está pulsado (true) o se ha soltado (false)
@@ -82,9 +82,17 @@ class igvInterfaz {
 		static void set_glutReshapeFunc(int w, int h); // método que define la camara de vision y el viewport
 		                                               // se llama automáticamente cuano se camba el tamaño de la ventana
 		static void set_glutDisplayFunc(); // método para visualizar la escena
+		static void set_glutIdleFunc(); // método para animar la escena
 
+	///// Apartado E y F: métodos para el control de la pulsación y el arrastre del ratón
+		static void  set_glutMouseFunc(GLint boton, GLint estado, GLint x, GLint y); // control de pulsacion del raton
+		static void  set_glutMotionFunc(GLint x, GLint y); // control del desplazamiento del raton con boton pulsado
 
 		// Metodos
+
+		//Actualiza la camara
+		void actualiza_camara(void);
+
 		// crea el mundo que se visualiza en la ventana
 		void crear_mundo(void);
 
@@ -94,6 +102,7 @@ class igvInterfaz {
 			                     int _pos_X, int _pos_Y, // posicion inicial de la ventana de visualización
 													 string _titulo // título de la ventan de visualización
 													 );
+		
 		void inicializa_callbacks(); // inicializa todas los callbacks
 
 		void inicia_bucle_visualizacion(); // visualiza la escena y espera a eventos sobre la interfaz
