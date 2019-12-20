@@ -1,0 +1,11 @@
+﻿  igvEscena3D.cpp
+c:\users\felipe\source\repos\proyectodeco\proyectodeco\codigo\igvpunto3d.h(25): warning C4091: 'typedef ': se ha omitido a la izquierda de '<unnamed-enum-X>' cuando no hay ninguna variable declarada
+c:\users\felipe\source\repos\proyectodeco\proyectodeco\codigo\igvcolor.h(17): warning C4091: 'typedef ': se ha omitido a la izquierda de '<unnamed-enum-R>' cuando no hay ninguna variable declarada
+c:\users\felipe\source\repos\proyectodeco\proyectodeco\codigo\igvescena3d.cpp(1816): warning C4838: la conversión de 'int' en 'GLubyte' requiere una conversión de restricción
+c:\users\felipe\source\repos\proyectodeco\proyectodeco\codigo\igvescena3d.cpp(1866): warning C4838: la conversión de 'int' en 'GLubyte' requiere una conversión de restricción
+c:\users\felipe\source\repos\proyectodeco\proyectodeco\codigo\igvescena3d.cpp(1920): warning C4838: la conversión de 'int' en 'GLubyte' requiere una conversión de restricción
+c:\users\felipe\source\repos\proyectodeco\proyectodeco\codigo\igvescena3d.cpp(2170): warning C4018: '<': no coinciden signed/unsigned
+c:\users\felipe\source\repos\proyectodeco\proyectodeco\codigo\igvescena3d.cpp(2234): warning C4838: la conversión de 'int' en 'GLubyte' requiere una conversión de restricción
+c:\users\felipe\source\repos\proyectodeco\proyectodeco\codigo\igvescena3d.cpp(2259): warning C4838: la conversión de 'int' en 'GLubyte' requiere una conversión de restricción
+c:\users\felipe\source\repos\proyectodeco\proyectodeco\codigo\igvescena3d.cpp(2284): warning C4838: la conversión de 'int' en 'GLubyte' requiere una conversión de restricción
+  ProyectoDeco.vcxproj -> C:\Users\Felipe\source\repos\ProyectoDeco\Debug\ProyectoDeco.exe
