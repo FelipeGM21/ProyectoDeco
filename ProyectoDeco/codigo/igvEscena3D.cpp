@@ -1019,6 +1019,109 @@ void igvEscena3D::cuadro() {
 
 }
 
+void igvEscena3D::planta() {
+	GLfloat azul[] = { 0,0,1,1.0 };
+	const char *hojas = "./hojas.bmp";
+	const char *palo = "./palo.bmp";
+	const char *base_maceta = "./maceta.bmp";
+	
+
+	glMaterialfv(GL_FRONT, GL_EMISSION, azul);
+	glPushMatrix();
+	glTranslatef(0.5, 0.9, 0.5);
+	glScalef(0.25,3.2, 0.25);
+	glutSolidCube(0.5,palo);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.5, 1.6, 0.5);
+	glScalef(0.4, 0.25, 0.4);
+	glutSolidCube(1,hojas);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.5, 1.3, 0.5);
+	glScalef(0.5, 0.25, 0.5);
+	glutSolidCube(1,hojas);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.5, 1, 0.5);
+	glScalef(0.6, 0.25, 0.6);
+	glutSolidCube(1, hojas);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0.5, 0.7, 0.5);
+	glScalef(0.7, 0.25, 0.7);
+	glutSolidCube(1, hojas);
+	glPopMatrix();
+
+	glTranslatef(0.3,0.0,0.3);
+	glScalef(0.5, 0.5, 0.5);
+	maceta(base_maceta);
+
+}
+
+void igvEscena3D::tierra() {
+	const char *tierra_base = "./tierra.bmp";
+	igvTextura tierra(tierra_base);
+
+	glBegin(GL_QUADS);
+	tierra.aplicar();
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0, 0.4, 0.7);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(0.2, 0.4, 0.0);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(0.7, 0.4, 0.0);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(0.7, 0.4, 0.7);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	glLoadIdentity();
+}
+
+void igvEscena3D::maceta(const char* archivo) {
+	GLfloat verde[] = { 0,1,0,1.0 };
+	GLfloat rojo[] = { 1,0,0,1.0 };
+	const char *tierra_base = "./tierra.bmp";
+
+	glMaterialfv(GL_FRONT, GL_EMISSION, verde);
+	igvTextura maceta(archivo);
+
+	maceta.aplicar();
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0, 0.0, 0.7);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(0.2, 0.0, 0.2);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(0.7, 0.0, 0.0);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(0.7, 0.0 ,0.7);
+
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(0.8, 0.5, 0.0);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(0.0, 0.5, 0.0);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(0.2, 0.0, 0.2);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(0.7, 0.0, 0.0);
+
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(0.0, 0.5, 0.0);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0, 0.5, 0.8);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(0.0, 0.0, 0.7);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(0.2, 0.0, 0.2);
+
+
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(0.8, 0.5, 0.8);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(0.8, 0.5, 0.0);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(0.7, 0.0, 0.0);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(0.7, 0.0, 0.7);
+
+
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0, 0.5, 0.8);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(0.8, 0.5, 0.8);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(0.7, 0.0, 0.7);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(0.0, 0.0, 0.7);
+
+	glDisable(GL_TEXTURE_2D);
+	glLoadIdentity();
+	glEnd();
+
+	tierra();
+}
+
 void igvEscena3D::visualizar() {
 	// crear luces
 	GLfloat luz0[4] = { 5.0,5.0,5.0,1 }; // luz puntual  
@@ -1071,6 +1174,11 @@ void igvEscena3D::visualizar() {
 	glPopMatrix();
 
 	glPushMatrix();
+	glTranslatef(0, 0, 0);
+	planta();
+	glPopMatrix();
+
+	glPushMatrix();
 	glTranslatef(0, 0, 1);
 	//glMaterialfv();
 	//silla();
@@ -1085,7 +1193,7 @@ void igvEscena3D::visualizar() {
 	glPushMatrix();
 	glTranslatef(1,0,0);
 	//silla();
-	mesa();
+	//mesa();
 	glPopMatrix();
 
 	glPushMatrix();

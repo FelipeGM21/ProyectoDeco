@@ -87,6 +87,9 @@ class igvEscena3D {
 	void parte_cuadro2(const char *archivo);
 	void crearSuelo(int x, int y);
 	void crearPared(int largo, int alto);
+	void maceta(const char* archivo);
+	void planta();
+	void tierra();
 
 
 ////// Apartado D: añadir aquí los métodos para modificar los grados de libertad del modelo
