@@ -84,6 +84,7 @@ class igvEscena3D {
 	void pintar_triangulo3D(const char *archivo);
 	void cuadro();
 	void parte_cuadro(const char *archivo);
+	void parte_cuadro2(const char *archivo);
 	void crearSuelo(int x, int y);
 	void crearPared(int largo, int alto);
 

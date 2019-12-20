@@ -426,8 +426,17 @@ void igvEscena3D::silla() {
 }
 
 void igvEscena3D::mesa() {
+	igvColor ambient(0.105882f, 0.058824f, 0.113725f, 1.0f);
+	igvColor diffuse(0.427451f, 0.470588f, 0.541176f, 1.0f);
+	igvColor specular(0.333333f, 0.333333f, 0.521569f, 1.0f);
+	double shine = 9.84615f;
+
+	igvMaterial material(ambient,diffuse,specular,shine);
+	material.aplicar();
+
 	glPushMatrix();
-	glMaterialfv(GL_FRONT, GL_EMISSION, marron);
+	
+	//glMaterialfv(GL_FRONT, GL_EMISSION, marron);
 	const char *archivo = "./mesa.bmp";
 	//pata izquierda trasera
 	glPushMatrix();
@@ -816,6 +825,48 @@ void igvEscena3D::pintar_triangulo3D(const char* archivo){
 	glLoadIdentity();
 }
 
+void igvEscena3D::parte_cuadro2(const char* archivo) {
+	GLfloat rojo[] = { 1,0,0,1.0 };
+	glMaterialfv(GL_FRONT, GL_EMISSION, rojo);
+	
+
+	glPushMatrix();
+	glTranslatef(0.0,1.0,0.0);
+		glPushMatrix();
+		glTranslatef(0.075, 0.42, 0.275);
+		glScalef(0.6, 2.2, 0.59);
+		glRotatef(90, 0, 0, 1);
+		glutSolidCube(0.25, archivo);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(0.0, 0.69, 0.35);
+		glScalef(0.15, 0.15, 0.15);
+		glRotatef(90, 0, 1, 0);
+		pintar_triangulo3D(archivo);
+		glPopMatrix();
+		
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(0,0.5,0);
+		glPushMatrix();
+		glTranslatef(0.075, 0.42, 0.275);
+		glScalef(0.6, 2.2, 0.59);
+		glRotatef(90, 0, 0, 1);
+		glutSolidCube(0.25, archivo);
+		glPopMatrix();
+
+		glPushMatrix();
+		glTranslatef(0.0, 0.0, 0.2);
+		glScalef(0.15, 0.15, 0.15);
+		glRotatef(90, 1, 0, 0);
+		glRotatef(90, 0, 1, 0);
+		pintar_triangulo3D(archivo);
+		glPopMatrix();
+	glPopMatrix();
+}
+
 void igvEscena3D::parte_cuadro(const char *archivo) {
 	GLfloat rojo[] = { 1,0,0,1.0 };
 	glMaterialfv(GL_FRONT, GL_EMISSION, rojo);
@@ -842,6 +893,75 @@ void igvEscena3D::parte_cuadro(const char *archivo) {
 	glScalef(0.15, 0.15, 0.15);
 	glRotatef(90, 0, 1, 0);
 	pintar_triangulo3D(archivo);
+	glPopMatrix();
+}
+
+void igvEscena3D::cuadroV(){
+	GLfloat rojo[] = { 1,0,0,1.0 };
+	glMaterialfv(GL_FRONT, GL_EMISSION, rojo);
+
+	const char *archivo = "./marco.bmp";
+	const char *archivo2 = "./paisaje.bmp";
+	const char *fondo1 = "./fondo_parte2.bmp";
+	const char *fondo2 = "./fondo_parte1.bmp";
+
+	//izquierda
+	glPushMatrix();
+	glTranslatef(0.15, 0.85, 2.13);
+	glRotatef(180, 0, 1, 0);
+	parte_cuadro2(archivo);
+	glPopMatrix();
+
+	//derecha
+	glPushMatrix();
+	glTranslatef(0.0, 0.85, 0.89);
+	parte_cuadro2(archivo);
+	glPopMatrix();
+
+	//arriba
+	glPushMatrix();
+	glTranslatef(0.0, 2.89, 1.09);
+	glRotatef(90, 1, 0, 0);
+	parte_cuadro(archivo);
+	glPopMatrix();
+
+	//abajo
+	glPushMatrix();
+	glTranslatef(0.15, 1.15, 1.09);
+	glRotatef(180, 0, 0, 1);
+	glRotatef(90, 1, 0, 0);
+	parte_cuadro(archivo);
+	glPopMatrix();
+
+	//fondo
+	igvTextura textura(fondo1);
+	textura.aplicar();
+	glPushMatrix();
+	glTranslatef(0.05, 0.8, 0.6);
+	glScalef(0.6, 0.6, 0.6);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0, 2.0, 2.0);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(0.0, 2.0, 1.0);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(0.0, 1.0, 1.0);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(0.0, 1.0, 2.0);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	glLoadIdentity();
+	glPopMatrix();
+
+	igvTextura textura2(fondo2);
+	textura2.aplicar();
+	glPushMatrix();
+	glTranslatef(0.05, 1.4, 0.6);
+	glScalef(0.6, 0.6, 0.6);
+	glBegin(GL_QUADS);
+	glTexCoord2f(0.0f, 1.0f); glVertex3f(0.0, 2.0, 2.0);
+	glTexCoord2f(1.0f, 1.0f); glVertex3f(0.0, 2.0, 1.0);
+	glTexCoord2f(1.0f, 0.0f); glVertex3f(0.0, 1.0, 1.0);
+	glTexCoord2f(0.0f, 0.0f); glVertex3f(0.0, 1.0, 2.0);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	glLoadIdentity();
 	glPopMatrix();
 }
 
@@ -944,9 +1064,16 @@ void igvEscena3D::visualizar() {
 	
 	
 	glPushMatrix();
+	glTranslatef(0, 0, 0);
+	//glMaterialfv();
+	cuadroV();
+	//silla();
+	glPopMatrix();
+
+	glPushMatrix();
 	glTranslatef(0, 0, 1);
 	//glMaterialfv();
-	silla();
+	//silla();
 	glPopMatrix();
 
 	glPushMatrix();
